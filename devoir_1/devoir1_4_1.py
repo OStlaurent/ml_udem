@@ -40,7 +40,8 @@ class diag_gaussian:
         # diagonal matrix => det(matrix) = product i=1 to n of element_i,i
         sqrt_det = np.sqrt(np.prod(variances))
 
-        return np.exp(-0.5 * sum(np.power(u,2)/variances)) / (np.power(2*np.pi, test_data.shape[0]/2) * sqrt_det)
+        #log(density)
+        return np.log(np.exp(-0.5 * sum(np.power(u,2)/variances)) / (np.power(2*np.pi, test_data.shape[0]/2) * sqrt_det))
 
 
 
