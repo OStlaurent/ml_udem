@@ -8,13 +8,17 @@ should have a train() method to learn the parameters and a method
 predict() which calculates the log density.
 """
 
-class diag_gaussian:
+class Diag_gaussian:
     def __init__(self):
         pass
 
     # The train function compute mu and the covariance matrix
     def train(self,train_data):
         self.train_data = train_data
+
+        #change train_data of shape (n,) to (n,1) for future computation
+        if len(train_data.shape) == 1:
+            self.train_data.shape = (train_data.shape[0],1)
 
         #means of each features
         self.mu = np.mean(self.train_data, axis=0)
@@ -52,8 +56,8 @@ if __name__ == '__main__':
     training_data[:, 1] = np.random.normal(10, 0.5, 100)
     training_data[:, 2] = np.random.normal(-4, 1, 100)
 
-    model = diag_gaussian()
+    model = Diag_gaussian()
     model.train(training_data)
-    for i in range(100):
+    for i in range(5):
         test_data = np.array([np.random.normal(0, 0.1, 1),np.random.normal(10, 0.5, 1), np.random.normal(-4, 1, 1)])
         print(model.predict(test_data))

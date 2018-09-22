@@ -19,7 +19,7 @@ def isotropic_gaussian(mu, variance, x, dist_func):
     """
     return np.exp(-0.5 * np.power(dist_func(mu, x), 2) / variance) / np.power(2 * np.pi * variance, mu.shape[1] / 2)
 
-class kernel_density_estimator:
+class Kernel_density_estimator:
     def __init__(self, h=1, kernel=isotropic_gaussian, dist_func=minkowski_mat):
         self.h = h
         self.kernel = kernel
@@ -27,12 +27,15 @@ class kernel_density_estimator:
 
     def train(self,train_data):
         self.train_data = train_data
+        # change train_data of shape (n,) to (n,1) for future computation
+        if len(train_data.shape) == 1:
+            self.train_data.shape = (train_data.shape[0], 1)
 
     def predict(self, x):
         #make sure that shape is correct
         x.shape = (self.train_data.shape[1],)
 
-        #kernel retourne un vecteur de tous les kernel(X_i,x)
+        #kernel return a vector containing each kernel(X_i,x)
         return np.log(np.mean( self.kernel(mu=self.train_data,variance=self.h, x=x, dist_func=self.dist_func)))
 
 
@@ -43,8 +46,8 @@ if __name__ == '__main__':
     training_data[:, 1] = np.random.normal(10, 0.5, 100)
     training_data[:, 2] = np.random.normal(-4, 1, 100)
 
-    model = kernel_density_estimator(h=3)
+    model = Kernel_density_estimator(h=1)
     model.train(training_data)
-    for i in range(100):
+    for i in range(5):
         test_data = np.array([np.random.normal(0, 0.1, 1),np.random.normal(10, 0.5, 1), np.random.normal(-4, 1, 1)])
         print(model.predict(test_data))
