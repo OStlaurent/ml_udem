@@ -1,0 +1,158 @@
+\documentclass[12pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[francais]{babel}
+\usepackage{amsmath, amssymb}
+
+\newcommand\ra\rightarrow
+\newcommand\la\leftarrow
+\newcommand\lra\leftrightarrow
+\newcommand\ua\uparrow
+\newcommand\da\downarrow
+\newcommand\uda\updownarrow
+\newcommand\nea\nearrow
+
+\newcommand\Ra\Rightarrow
+\newcommand\La\Leftarrow
+\newcommand\Lra\Leftrightarrow
+
+\newcommand\mat[1]{\begin{bmatrix} #1 \end{bmatrix}}
+\newcommand\smat[1]{\setstretch{1}{\ensuremath{\scalefont{0.8}\mat{#1}}}}
+
+\newcommand{\bra}[1]{\ensuremath{\left\langle#1\right|}}
+\newcommand{\ket}[1]{\ensuremath{\left|#1\right\rangle}}
+\newcommand{\bracket}[2]{\ensuremath{\left\langle #1 \middle| #2 \right\rangle}}
+\newcommand{\matrixel}[3]{\ensuremath{\left\langle #1 \middle| #2 \middle| #3 \right\rangle}}
+\newenvironment{eq*}{\begin{equation*}\begin{gathered}}{\end{gathered}\end{equation*}}
+\newenvironment{eqs*}{\begin{equation*}\begin{aligned}}{\end{aligned}\end{equation*}}
+
+% Paragraph formatting
+\setlength{\parindent}{0pt}
+\usepackage{setspace}
+\onehalfspacing
+% Margin
+\usepackage[margin=1in]{geometry}
+\setcounter{secnumdepth}{0}
+
+% Doc info
+\author{Olivier St-Laurent, Maxime Daigle}
+\title{IFT-3395  Devoir 1}
+
+\begin{document}
+
+\maketitle
+
+\section{Question 1}
+
+Nous pensons que cette conclusion est des médecins est fause. En réalité, puisque la probabilité d'un vrai positif est très faible comparativement à un
+vrai négatif (1.5\% contre 98.5\% respectivement), les chances d'obtenir des faux positifs viennent contre balancer les chance de vrai positive puisque, plus souvent qu'autrement, les probabilité de ne pas avoir de cancer sont largement supérieur au probabilité d,avoir un cancer.
+\\[\baselineskip]
+Si nous calculons la probabilité exacte avec la loi de Bayes, nous avons:
+\begin{eqs*}
+P(cancer | +) = \tfrac{P(+ | cancer) * P(cancer)}{P(+ | cancer) * P(cancer) + P(+ | cancer^c) * P(cancer^c)}
+\end{eqs*}
+\\[\baselineskip]
+En remplaçant dans l'équation les valeurs que nous avons, nous obtenons:
+\begin{eqs*}
+P(cancer | +) = \tfrac{(0.87)(0.015)}{(0.87)(0.015) + (0.097)(1 - 0.015)} = 0.12\%
+\end{eqs*}
+
+\section{Question 2}
+\subsection{2.1}
+Si pour 2 dimensions, l'aire d'un carré de côté $c$ est donné par $c^2$ et que pour 3 dimensions, le volume d'un cube de côté $c$ est donné par $c^3$, alors
+on peut généralisé que le volume d'un hyper-cube de coté $c$ en dimension $d$ est donné par $V = c^d$
+
+
+\subsection{2.2}
+
+Pour une variable aléatoire $X$ uniformément distribuer sur un interval [$\alpha$, $\beta$] de dimension 1, sa fonction de densité de probabilité est donné par:
+\[
+    f(x) =
+	\begin{cases}
+        \tfrac{1}{\beta -\alpha}, & \text{si $\alpha \leq x \leq \beta$} \\
+        0, & \text{ sinon}
+	\end{cases}
+\]
+Pour un variable aléatoire vectorielle $X$ de 2 dimensions uniformément distribué sur une région $R$, elle aussi de deux xdimension, la fonction
+de densité conjointe est une constante $c$ pour tout point dans $R$ et 0 pour tout point a l'extérieur de $R$
+\[
+    f(x_{1}, x_{2}) =
+	\begin{cases}
+        c, & \text{si $(x_{1}, x_{2}) \in R$}  \\
+        0, & \text{ sinon}
+	\end{cases}
+\]
+
+Si on généralise le cas pour $n$ dimensions, on abtient la fonction de densité conjointe:
+\[
+    f(x_{1}, ...,x_{d}) =
+	\begin{cases}
+        c, & \text{si $(x_{1}, ..., x_{d}) \in R^d$}  \\
+        0, & \text{ sinon}
+	\end{cases}
+\]
+
+La probabilité $p(x)$ pour une valeur exacte dans un problème de probabilité continue est de 0, car l'intervale est infiniment petit.
+\\[\baselineskip]
+En effet, la probabilité $p(x)$ dans $d$ dimension peut être calculé par:
+
+\begin{eqs*}
+p(x) = \int_{\alpha_{1}}^{\beta_{1}} ... \int_{\alpha_{d}}^{\beta_{d}} f(x_{1}, ...,x_{d})dx_{1}... dx_{d} = c*\text{Volume de }R^d
+\end{eqs*}
+
+\subsection{2.3}
+Si la  bordure est de 3\%, la probabilité que $x_{i}$, $i \in 1, ..., d$ se retrouve dans celle zone est de $1 - 0.94 = 0.06$ Donc pour un $x$ de l'hyper-cube, la
+probabilité de tomber dans le cube et pas dans la bordure donné par l'équation:
+\begin{eqs*}
+p(x) = \int_{0}^{0.94} ... \int_{0}^{0.94}dx_{1}... dx_{d} = \tfrac{0.94^d}{1}
+\end{eqs*}
+et la probabilité de tombé dans la bordure est de:
+\begin{eqs*}
+1 - p(x) =1 - \tfrac{0.94^d}{1}
+\end{eqs*}
+
+\subsection{2.4}
+Pour $d$ = 1
+\begin{eqs*}
+1 - p(x) =1 - \tfrac{0.94^1}{1} = 0.06
+\end{eqs*}
+
+Pour $d$ = 2
+\begin{eqs*}
+1 - p(x) =1 - \tfrac{0.94^2}{1} = 0.1164
+\end{eqs*}
+
+Pour $d$ = 3
+\begin{eqs*}
+1 - p(x) =1 - \tfrac{0.94^5}{1} = 0.1694
+\end{eqs*}
+
+Pour $d$ = 5
+\begin{eqs*}
+1 - p(x) =1 - \tfrac{0.94^5}{1} = 0.2661
+\end{eqs*}
+
+Pour $d$ = 10
+\begin{eqs*}
+1 - p(x) =1 - \tfrac{0.94^{10}}{1} = 0.4613
+\end{eqs*}
+
+Pour $d$ = 100
+\begin{eqs*}
+1 - p(x) =1 - \tfrac{0.94^{100}}{1} = 0.9979
+\end{eqs*}
+
+Pour $d$ = 1000
+\begin{eqs*}
+1 - p(x) =1 - \tfrac{0.94^{1000}}{1} = 1 - 1.3423*10^{-27}
+\end{eqs*}
+
+\newpage
+\subsection{2.5}
+
+Plus la dimensionalité est grande, plus la probabilité de tombé dans la bordure augmente. Si on y pense, c'est logique, par lorsque la dimensionalité est de 
+100, par exemple, pour tomber dans la bordure, il suffit qu'une seule des 100 dimensions soit dans celle si pour ne plus être dans la hyper-cube. 
+
+\section{Question 1}
+\subsection{3.1}
+\end{document}
