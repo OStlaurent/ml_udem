@@ -22,40 +22,60 @@ import devoir1_4_2
 import matplotlib.pyplot as plt
 
 data = np.loadtxt('iris.txt')
-#take only class 1 and only one features (Sepal Width)
-data = data[0:50,1]
-data.sort()
+#take only class 1 and only one features (Sepal Length)
+data = data[0:50,0]
+
+#x axis
+min_x, max_x = min(data), max(data)
+x = np.array(np.linspace(min_x, max_x))
 
 #b)
 model_b = devoir1_4_1.Diag_gaussian()
 model_b.train(data)
-y_b = [model_b.predict(e) for e in data]
-plt.plot(data,y_b, 'b', label='parametric Gaussian')
+# y_b = [model_b.predict(e) for e in data]
+# plt.plot(data,y_b, 'b', label='parametric Gaussian')
+y_b = [model_b.predict(np.array([e])) for e in x]
+plt.plot(x, y_b, 'b', label='parametric Gaussian')
 
 #c)
 model_c = devoir1_4_2.Kernel_density_estimator(h=0.001)
 model_c.train(data)
-y_c = [model_c.predict(e) for e in data]
-plt.plot(data,y_c,'g', label='Parzen (sigma too small)')
+# y_c = [model_c.predict(e) for e in data]
+# plt.plot(data,y_c,'g', label='Parzen (sigma too small)')
+y_c = [model_c.predict(np.array([e])) for e in x]
+plt.plot(x,y_c,'g', label='Parzen (sigma too small)')
 
 #d)
-model_d = devoir1_4_2.Kernel_density_estimator(h=0.01)
+model_d = devoir1_4_2.Kernel_density_estimator(h=0.05)
 model_d.train(data)
-y_d = [model_d.predict(e) for e in data]
-plt.plot(data,y_d,'r', label='Parzen (sigma too big)')
+# y_d = [model_d.predict(e) for e in data]
+# plt.plot(data,y_d,'r', label='Parzen (sigma too big)')
+y_d = [model_d.predict(np.array([e])) for e in x]
+plt.plot(x,y_d,'r', label='Parzen (sigma too big)')
 
 #e)
-model_e = devoir1_4_2.Kernel_density_estimator(h=0.05)
+model_e = devoir1_4_2.Kernel_density_estimator(h=0.007)
 model_e.train(data)
-y_e = [model_e.predict(e) for e in data]
-plt.plot(data,y_e,'y', label='Parzen (better sigma)')
+# y_e = [model_e.predict(e) for e in data]
+# plt.plot(data,y_e,'y', label='Parzen (better sigma)')
+y_e = [model_e.predict(np.array([e])) for e in x]
+plt.plot(x,y_e,'y', label='Parzen (better sigma)')
 
 plt.ylabel('log density')
-plt.xlabel('Sepal Width')
+plt.xlabel('Sepal Length')
 plt.legend(loc='best')
 plt.show()
 
-#TODO f) expliquer choix de sigma
-print('Scott\'s Rule: n**(-1./(d+4)) =', 50**(-1./(1+4)))
-print('Silverman\'s Rule: (n * (d + 2) / 4.)**(-1. / (d + 4))', (50 * (1 + 2) / 4.)**(-1. / (1 + 4)))
-print('Bandwidth selection strongly influences the estimate obtained from the KDE (much more so than the actual shape of the kernel). Bandwidth selection can be done by a “rule of thumb”, by cross-validation, by “plug-in methods” or by other means; see [3], [4] for reviews. gaussian_kde uses a rule of thumb, the default is Scott’s Rule.')
+#f) expliquer choix de sigma
+"""
+Le premier sigma est trop petit, car il suit trop les points des données d'entrainement.
+Alors, la courbe résultante n'est pas lisse et change de valeur brusquement (exemple: x=5.4 et x=5.6).
+Le deuxième sigma est trop grand, car la courbe ne capture pas les subtilités des données et elle ne forme qu'une large cloche.
+Le troisième sigma représente un meilleur sigma, car la courbe montre quelques subtilités des données tout en restant lisse
+et sans avoir de grosses variances de densité entre des valeurs proches.
+"""
+
+
+# print('Scott\'s Rule: n**(-1./(d+4)) =', 50**(-1./(1+4)))
+# print('Silverman\'s Rule: (n * (d + 2) / 4.)**(-1. / (d + 4))', (50 * (1 + 2) / 4.)**(-1. / (1 + 4)))
+# print('Bandwidth selection strongly influences the estimate obtained from the KDE (much more so than the actual shape of the kernel). Bandwidth selection can be done by a “rule of thumb”, by cross-validation, by “plug-in methods” or by other means; see [3], [4] for reviews. gaussian_kde uses a rule of thumb, the default is Scott’s Rule.')
