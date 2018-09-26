@@ -154,6 +154,97 @@ Plus la dimensionalité est grande, plus la probabilité de tomber dans la bordu
 100, par exemple, pour tomber dans la bordure, il suffit qu'une seule des 100 dimensions soit dans celle-ci pour ne plus être dans l'hyper-cube. 
 
 \section{Question 3}
-\subsection{3.1}
-\subsubsection{a)}
+Pour la question 3, on considère un ensemble de données $D = \{x^{(1)}, ..., x^{(n)}\}$ avec $x \in \mathbb{R}^{d}$
+\subsection{3.1 Les paramètres d’une densité Gaussienne isotropique sur D}
+
+\subsubsection{a) - Nommez ces paramètres et indiquez-en les dimensions.}
+$\mu$: est la moyenne et elle est de dimention t$d$ \\
+$\sigma$: est la variance et elle est de dimension 1 \\
+$\Sigma = \sigma^{2}I$ est la matrice de covariance et elle est de dimension $[d \text{, } d]$. 
+
+\subsubsection{b) - Exprimez en fonction des points de D la formule qui nous donnera la valeur des paramètres optimaux.}
+\begin{eqs*}
+\mu = \tfrac{1}{n}\sum_{t=1}^{n} x^{(t)}
+\end{eqs*}
+
+\begin{eqs*}
+\Sigma_{ij} = \tfrac{1}{n}\sum_{t=1}^{n}(x_{i}^{(t)} - \mu_{i})(x_{j}^{(t)} - \mu_{j})
+\end{eqs*}
+
+\begin{eqs*}
+\Sigma= \tfrac{1}{n}\sum_{t=1}^{n}(x^{(t)} - \mu)(x^{(t)} - \mu)^{'}
+\end{eqs*}
+
+\subsubsection{c) - Quelle est la complexité algorithmique de cet apprentissage?}
+
+Pour calculer $\mu: O(n*d)$, car calculer $\mu_{i}$ est $O(n)$ et $O(d)$ pour l'espace mémoire. \\
+Pour calculer $\Sigma_{ij}: O(n)$ \\ 
+et pour calculer $\Sigma:O(n+d)$ car puisque nous sommes dans un cas isotropique, $\Sigma = \sigma^{2}I$. Cela signifie qu'on doit calculer
+$\sigma^{2}$ une fois pour ensuite créer une matrice diagonale de $d$ éléments non nuls. Si ce n'était pas un cas isotropique, la complexité algorithmique de $\Sigma$ serait $O(n*d)$
+
+\subsubsection{d) - Pour un point de test x, écrivez la fonction qui donnera la densité de probabilité prédite au point x}
+\[
+	\hat{p}(x) = \tfrac{1}{2\pi^{\frac{d}{2}}\sqrt{\left|\Sigma\right|}} * exp(-\frac{1}{2}(x - \mu)^{T}\Sigma^{-1}(x - \mu))
+\]
+\[
+	= \tfrac{1}{2\pi^{\frac{d}{2}}\sigma^{d}} * exp(-\frac{1}{2}\frac{||x - \mu ||^{2}}{\sigma^{2}})
+\]
+
+où
+\[\mu = \tfrac{1}{n}\sum_{t=1}^{n} x^{(t)}\]
+et
+\[
+\Sigma = \tfrac{1}{n}\sum_{t=1}^{n}(x^{(t)} - \mu)(x^{(t)} - \mu)^{'} \\
+= \sigma^{2}I
+\]
+
+\subsubsection{e) - Quelle est la complexité algorithmique pour le calcul de cette prédiction à chaque nouveau point x}
+Pour calculer la complexité est $\hat{p}:O(n*d + n +  d + d)$ Si ont doit calculer $\mu$ et $\sigma$ préalablement. Sinon,
+la complexité, losqu'on connait déjà  $\mu$ et $\sigma$ est de $O(d)$
+\\
+JE VOIS MAL LA FIN DE LA FEUILLE ET JE COMPREND PAS LES CALCULS
+\subsection{3.2 Les fenêtre de Parzen}
+\subsubsection{a) - $\sigma$ fixé, en quoi consiste le training par les fenêtres de Parzen}
+\begin{eqs*}
+	K(X_{i}, x) = \tfrac{1}{2\pi^{\frac{d}{2}}\sigma^{d}} * exp(-\frac{1}{2}\frac{d(X_{i},x)^{2}}{\sigma^{2}})
+\end{eqs*}
+\begin{eqs*}
+	= \mathcal{N}_{x_{i}, \sigma^{2}}(x)
+\end{eqs*}
+
+où $x_{i}$ est QUELQUE CHOSE POINTER PAR UNE FLECHE et $x$ est le point au centre de la zone QUELQUE CHOSE PAS CAPABLE DE LIRE
+\begin{eqs*}
+	= \mathcal{N}_{x, \sigma^{2}}(x_{i})
+\end{eqs*}
+
+On a que
+\begin{eqs*}
+	f(x) = \hat{p} = \frac{1}{n}\sum_{i=1}^{n} K(X_{i}, x)
+\end{eqs*}
+\begin{eqs*}
+	= \frac{1}{n}\sum_{i=1}^{n} \mathcal{N}_{x_{i}, \sigma^{2}}(x)
+\end{eqs*}
+
+Puisqu'il n,y a pas de paramètres à entrainer/estimer, il n'y a pas d'entrainement à faire. Nous devons simplement stocker les données d'apprentissage.
+C'est lorsqu'on veut calculer pour un nouveau point que les calculs sont faits.
+
+\subsubsection{b) - Écrivez en une seule formule la fonction qui donnera la densité de probabilité prédite au point x}
+\begin{eqs*}
+	\hat{p}(x) = \frac{1}{n}*\frac{1}{(2\pi)^{\frac{d}{2}}\sigma^{d}} \sum_{i=1}^{n} exp(-\frac{1}{2}*\frac{d(X_{i}, x)^{2}}{\sigma^{2}})
+\end{eqs*}
+
+\subsubsection{c) - Quelle est la complexité algorithmique pour le calcul de cette prédiction à chaque nouveau point x}
+La complexité est de $O(n)$, car les mesure de distance vi sont $L_{2},  L_{1},  L_{????},  L_{p},  L_{????}$.
+Donc, $d(a,b) = (\sum_{i=1}^{d}|a_{i} - b_{i}|^{????})^{\frac{1}{p}}$ est en $O(d)$  
+
+\subsection{3.3 Capacité}
+\subsubsection{(a)}
+Le Parzen à noyau Gaussien a la plus forte capacité étant donné qu'il peut exprimer l'équivalent de plusieurs densité paramétriques Gaussienne. 
+\\
+METTRE UN PEU PLUS D'EXPLICATION. E.G DEFINITION DE LA CAPACITER
+\subsubsection{(b)}
+Avec les fenêtre de Parzen à noyau Gaussien, il y a de plus forte chance d'avoir du sur-apprentissage. En effet, quand $\sigma$ est très proche de zéro, la capacité se veut largement trop forte relativement à la quantité de données. Cela va créer beaucoup de piques autour des points de données. 
+
+\subsubsection{(c)}
+Les fenêtres de Parzen sont non-paramétrique, c'est-à-dire qu'il n'y a pas de supposition sur la forme de la fonction cible. Tandis que, pour la densité paramétrique Gaussienne, on suppose que la fonction de densité est connue et on cherche à estimer les paramètre de la distribution. En d'autre mots, l'utilisateur doit fixer le $\sigma$ lorsqu'il utilise les fenêtre de parzen et il doit valider sont choix en utilissant la méthode de validation croisée. Dans l'autre cas, rien n'est fixée par l'utilisateur,  $\sigma$ est inféré par l'algorithme.
 \end{document}
