@@ -37,6 +37,7 @@
 % Doc info
 \author{Olivier St-Laurent, Maxime Daigle}
 \title{IFT-3395  Devoir 1}
+\date{2018-09-27}
 
 \begin{document}
 
@@ -44,8 +45,7 @@
 
 \section{Question 1}
 
-Nous pensons que cette conclusion est des médecins est fause. En réalité, puisque la probabilité d'un vrai positif est très faible comparativement à un
-vrai négatif (1.5\% contre 98.5\% respectivement), les chances d'obtenir des faux positifs viennent contre balancer les chance de vrai positive puisque, plus souvent qu'autrement, les probabilité de ne pas avoir de cancer sont largement supérieur au probabilité d,avoir un cancer.
+Nous pensons que la conclusion des médecins est fausse. En réalité, puisque la probabilité à priori d'avoir le cancer est très faible (1.5\%), la probabilité de ne pas être atteint du cancer, en sachant que le test est positif, est largement supérieure à la probabilité d'être atteinte.
 \\[\baselineskip]
 Si nous calculons la probabilité exacte avec la loi de Bayes, nous avons:
 \begin{eqs*}
@@ -54,7 +54,7 @@ P(cancer | +) = \tfrac{P(+ | cancer) * P(cancer)}{P(+ | cancer) * P(cancer) + P(
 \\[\baselineskip]
 En remplaçant dans l'équation les valeurs que nous avons, nous obtenons:
 \begin{eqs*}
-P(cancer | +) = \tfrac{(0.87)(0.015)}{(0.87)(0.015) + (0.097)(1 - 0.015)} = 0.12\%
+P(cancer | +) = \tfrac{(0.87)(0.015)}{(0.87)(0.015) + (0.096)(1 - 0.015)} = 0.12\%
 \end{eqs*}
 
 \section{Question 2}
@@ -65,7 +65,7 @@ on peut généralisé que le volume d'un hyper-cube de coté $c$ en dimension $d
 
 \subsection{2.2}
 
-Pour une variable aléatoire $X$ uniformément distribuer sur un interval [$\alpha$, $\beta$] de dimension 1, sa fonction de densité de probabilité est donné par:
+Pour une variable aléatoire $X$ uniformément distribuer sur un interval [$\alpha$, $\beta$] de dimension 1, sa fonction de densité de probabilité est donnée par:
 \[
     f(x) =
 	\begin{cases}
@@ -73,7 +73,7 @@ Pour une variable aléatoire $X$ uniformément distribuer sur un interval [$\alp
         0, & \text{ sinon}
 	\end{cases}
 \]
-Pour un variable aléatoire vectorielle $X$ de 2 dimensions uniformément distribué sur une région $R$, elle aussi de deux xdimension, la fonction
+Pour une variable aléatoire vectorielle $X$ de 2 dimensions uniformément distribuée sur une région $R$, elle aussi de deux dimension, la fonction
 de densité conjointe est une constante $c$ pour tout point dans $R$ et 0 pour tout point a l'extérieur de $R$
 \[
     f(x_{1}, x_{2}) =
@@ -83,7 +83,7 @@ de densité conjointe est une constante $c$ pour tout point dans $R$ et 0 pour t
 	\end{cases}
 \]
 
-Si on généralise le cas pour $n$ dimensions, on abtient la fonction de densité conjointe:
+Si on généralise le cas pour $n$ dimensions, on obtient la fonction de densité conjointe:
 \[
     f(x_{1}, ...,x_{d}) =
 	\begin{cases}
@@ -101,12 +101,12 @@ p(x) = \int_{\alpha_{1}}^{\beta_{1}} ... \int_{\alpha_{d}}^{\beta_{d}} f(x_{1}, 
 \end{eqs*}
 
 \subsection{2.3}
-Si la  bordure est de 3\%, la probabilité que $x_{i}$, $i \in 1, ..., d$ se retrouve dans celle zone est de $1 - 0.94 = 0.06$ Donc pour un $x$ de l'hyper-cube, la
-probabilité de tomber dans le cube et pas dans la bordure donné par l'équation:
+Si la  bordure est de 3\%, la probabilité que $x_{i}$, $i \in 1, ..., d$ se retrouve dans cette zone est de $1 - 0.94 = 0.06$ Donc pour un $x$ de l'hyper-cube, la
+probabilité de tomber dans le cube et pas dans la bordure est donnée par l'équation:
 \begin{eqs*}
 p(x) = \int_{0}^{0.94} ... \int_{0}^{0.94}dx_{1}... dx_{d} = \tfrac{0.94^d}{1}
 \end{eqs*}
-et la probabilité de tombé dans la bordure est de:
+et la probabilité de tomber dans la bordure est de:
 \begin{eqs*}
 1 - p(x) =1 - \tfrac{0.94^d}{1}
 \end{eqs*}
@@ -150,9 +150,10 @@ Pour $d$ = 1000
 \newpage
 \subsection{2.5}
 
-Plus la dimensionalité est grande, plus la probabilité de tombé dans la bordure augmente. Si on y pense, c'est logique, par lorsque la dimensionalité est de 
-100, par exemple, pour tomber dans la bordure, il suffit qu'une seule des 100 dimensions soit dans celle si pour ne plus être dans la hyper-cube. 
+Plus la dimensionalité est grande, plus la probabilité de tomber dans la bordure augmente. Si on y pense, c'est logique, car lorsque la dimensionalité est de 
+100, par exemple, pour tomber dans la bordure, il suffit qu'une seule des 100 dimensions soit dans celle-ci pour ne plus être dans l'hyper-cube. 
 
-\section{Question 1}
+\section{Question 3}
 \subsection{3.1}
+\subsubsection{a)}
 \end{document}
