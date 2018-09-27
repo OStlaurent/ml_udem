@@ -58,12 +58,12 @@ P(cancer | +) = \tfrac{(0.87)(0.015)}{(0.87)(0.015) + (0.096)(1 - 0.015)} = 0.12
 \end{eqs*}
 
 \section{Question 2}
-\subsection{2.1}
+\subsection{2.1 Volume d'un hyper-cube}
 Si pour 2 dimensions, l'aire d'un carré de côté $c$ est donné par $c^2$ et que pour 3 dimensions, le volume d'un cube de côté $c$ est donné par $c^3$, alors
 on peut généralisé que le volume d'un hyper-cube de coté $c$ en dimension $d$ est donné par $V = c^d$
 
 
-\subsection{2.2}
+\subsection{2.2 Densité de probabilité}
 
 Pour une variable aléatoire $X$ uniformément distribuer sur un interval [$\alpha$, $\beta$] de dimension 1, sa fonction de densité de probabilité est donnée par:
 \[
@@ -100,7 +100,7 @@ En effet, la probabilité $p(x)$ dans $d$ dimension peut être calculé par:
 p(x) = \int_{\alpha_{1}}^{\beta_{1}} ... \int_{\alpha_{d}}^{\beta_{d}} f(x_{1}, ...,x_{d})dx_{1}... dx_{d} = c*\text{Volume de }R^d
 \end{eqs*}
 
-\subsection{2.3}
+\subsection{2.3 Probabilité d'être dans l'hyper-cube}
 Si la  bordure est de 3\%, la probabilité que $x_{i}$, $i \in 1, ..., d$ se retrouve dans cette zone est de $1 - 0.94 = 0.06$ Donc pour un $x$ de l'hyper-cube, la
 probabilité de tomber dans le cube et pas dans la bordure est donnée par l'équation:
 \begin{eqs*}
@@ -111,7 +111,7 @@ et la probabilité de tomber dans la bordure est de:
 1 - p(x) =1 - \tfrac{0.94^d}{1}
 \end{eqs*}
 
-\subsection{2.4}
+\subsection{2.4 Probabilité d'être dans la bordure}
 Pour $d$ = 1
 \begin{eqs*}
 1 - p(x) =1 - \tfrac{0.94^1}{1} = 0.06
@@ -148,7 +148,7 @@ Pour $d$ = 1000
 \end{eqs*}
 
 \newpage
-\subsection{2.5}
+\subsection{2.5 Conclusion sur la répartition}
 
 Plus la dimensionalité est grande, plus la probabilité de tomber dans la bordure augmente. Si on y pense, c'est logique, car lorsque la dimensionalité est de 
 100, par exemple, pour tomber dans la bordure, il suffit qu'une seule des 100 dimensions soit dans celle-ci pour ne plus être dans l'hyper-cube. 
@@ -158,9 +158,9 @@ Pour la question 3, on considère un ensemble de données $D = \{x^{(1)}, ..., x
 \subsection{3.1 Les paramètres d’une densité Gaussienne isotropique sur D}
 
 \subsubsection{a) - Nommez ces paramètres et indiquez-en les dimensions.}
-$\mu$: est la moyenne et elle est de dimention t$d$ \\
+$\mu$: est la moyenne et elle est de dimention $d$ \\
 $\sigma$: est la variance et elle est de dimension 1 \\
-$\Sigma = \sigma^{2}I$ est la matrice de covariance et elle est de dimension $[d \text{, } d]$. 
+$\Sigma = \sigma^{2}I$ est la matrice de covariance et elle est de dimension $d \text{x} d$. 
 
 \subsubsection{b) - Exprimez en fonction des points de D la formule qui nous donnera la valeur des paramètres optimaux.}
 \begin{eqs*}
@@ -177,10 +177,10 @@ $\Sigma = \sigma^{2}I$ est la matrice de covariance et elle est de dimension $[d
 
 \subsubsection{c) - Quelle est la complexité algorithmique de cet apprentissage?}
 
-Pour calculer $\mu: O(n*d)$, car calculer $\mu_{i}$ est $O(n)$ et $O(d)$ pour l'espace mémoire. \\
+Pour calculer $\mu: O(n*d)$, car calculer $\mu_{i}$ est $O(n)$. \\
 Pour calculer $\Sigma_{ij}: O(n)$ \\ 
-et pour calculer $\Sigma:O(n+d)$ car puisque nous sommes dans un cas isotropique, $\Sigma = \sigma^{2}I$. Cela signifie qu'on doit calculer
-$\sigma^{2}$ une fois pour ensuite créer une matrice diagonale de $d$ éléments non nuls. Si ce n'était pas un cas isotropique, la complexité algorithmique de $\Sigma$ serait $O(n*d)$
+et pour calculer $\Sigma:O(n+d)$, car nous sommes dans un cas isotropique, i.e $\Sigma = \sigma^{2}I$. Cela signifie qu'on doit calculer
+$\sigma^{2}$ une fois, puis créer une matrice diagonale de $d$ éléments non nuls. (Si ce n'était pas un cas isotropique, la complexité algorithmique de $\Sigma$ serait $O(n*d^2)$)
 
 \subsubsection{d) - Pour un point de test x, écrivez la fonction qui donnera la densité de probabilité prédite au point x}
 \[
@@ -192,41 +192,24 @@ $\sigma^{2}$ une fois pour ensuite créer une matrice diagonale de $d$ élément
 
 où
 \[\mu = \tfrac{1}{n}\sum_{t=1}^{n} x^{(t)}\]
-et
 \[
-\Sigma = \tfrac{1}{n}\sum_{t=1}^{n}(x^{(t)} - \mu)(x^{(t)} - \mu)^{'} \\
-= \sigma^{2}I
+\Sigma = \sigma^{2}I  \implies (x - \mu)^{T}\Sigma^{-1}(x - \mu) = \frac{ (x - \mu)^{T}(x - \mu)}{\sigma^{2}} = \frac{||x - \mu ||^{2}}{\sigma^{2}}
+\]
+
+\[
+det(\Sigma) = det(\sigma^{2}I) = \sigma^{2d}det(I) = \sigma^{2d}  
 \]
 
 \subsubsection{e) - Quelle est la complexité algorithmique pour le calcul de cette prédiction à chaque nouveau point x}
-Pour calculer la complexité est $\hat{p}:O(n*d + n +  d + d)$ Si ont doit calculer $\mu$ et $\sigma$ préalablement. Sinon,
-la complexité, losqu'on connait déjà  $\mu$ et $\sigma$ est de $O(d)$
+La complexité de $\hat{p}$ est :  $O(n*d + n +  d)$ si ont doit calculer $\mu$ et $\sigma$. Sinon,
+la complexité, losqu'on connait déjà  $\mu$ et $\sigma$, est de $O(d)$ étant donné que calculer $\mu$ prend $O(n*d)$, calculer $\sigma^{2}$ prend $O(n)$ et calculer $||x - \mu ||^{2}$ prend $O(d)$.
 \\
-JE VOIS MAL LA FIN DE LA FEUILLE ET JE COMPREND PAS LES CALCULS
-\subsection{3.2 Les fenêtre de Parzen}
-\subsubsection{a) - $\sigma$ fixé, en quoi consiste le training par les fenêtres de Parzen}
-\begin{eqs*}
-	K(X_{i}, x) = \tfrac{1}{2\pi^{\frac{d}{2}}\sigma^{d}} * exp(-\frac{1}{2}\frac{d(X_{i},x)^{2}}{\sigma^{2}})
-\end{eqs*}
-\begin{eqs*}
-	= \mathcal{N}_{x_{i}, \sigma^{2}}(x)
-\end{eqs*}
 
-où $x_{i}$ est QUELQUE CHOSE POINTER PAR UNE FLECHE et $x$ est le point au centre de la zone QUELQUE CHOSE PAS CAPABLE DE LIRE
-\begin{eqs*}
-	= \mathcal{N}_{x, \sigma^{2}}(x_{i})
-\end{eqs*}
+\subsection{3.2 Les fenêtres de Parzen}
+\subsubsection{a) - Supposons $\sigma$ fixé, en quoi consiste la phase d'entrainement pour les fenêtres de Parzen}
 
-On a que
-\begin{eqs*}
-	f(x) = \hat{p} = \frac{1}{n}\sum_{i=1}^{n} K(X_{i}, x)
-\end{eqs*}
-\begin{eqs*}
-	= \frac{1}{n}\sum_{i=1}^{n} \mathcal{N}_{x_{i}, \sigma^{2}}(x)
-\end{eqs*}
-
-Puisqu'il n,y a pas de paramètres à entrainer/estimer, il n'y a pas d'entrainement à faire. Nous devons simplement stocker les données d'apprentissage.
-C'est lorsqu'on veut calculer pour un nouveau point que les calculs sont faits.
+Puisqu'il n'y a pas de paramètres à entrainer/estimer, la phase d'entrainement consiste seulement à stocker les données d'apprentissage.
+C'est lorsqu'on fait la prédiction pour un nouveau point que les calculs sont faits.
 
 \subsubsection{b) - Écrivez en une seule formule la fonction qui donnera la densité de probabilité prédite au point x}
 \begin{eqs*}
@@ -234,17 +217,33 @@ C'est lorsqu'on veut calculer pour un nouveau point que les calculs sont faits.
 \end{eqs*}
 
 \subsubsection{c) - Quelle est la complexité algorithmique pour le calcul de cette prédiction à chaque nouveau point x}
-La complexité est de $O(n)$, car les mesure de distance vi sont $L_{2},  L_{1},  L_{????},  L_{p},  L_{????}$.
-Donc, $d(a,b) = (\sum_{i=1}^{d}|a_{i} - b_{i}|^{????})^{\frac{1}{p}}$ est en $O(d)$  
+La complexité est de $O(n*d)$, car les mesure de distance qui ont été vues ($L_{2},  L_{1},  L_{\infty},  L_{p},  L_{cos}$) prennent un temps de $O(d)$  
 
 \subsection{3.3 Capacité}
-\subsubsection{(a)}
+\subsubsection{a) - Paramétrique Gaussienne vs Parzen à noyau Gaussien}
 Le Parzen à noyau Gaussien a la plus forte capacité étant donné qu'il peut exprimer l'équivalent de plusieurs densité paramétriques Gaussienne. 
-\\
-METTRE UN PEU PLUS D'EXPLICATION. E.G DEFINITION DE LA CAPACITER
-\subsubsection{(b)}
-Avec les fenêtre de Parzen à noyau Gaussien, il y a de plus forte chance d'avoir du sur-apprentissage. En effet, quand $\sigma$ est très proche de zéro, la capacité se veut largement trop forte relativement à la quantité de données. Cela va créer beaucoup de piques autour des points de données. 
+\subsubsection{b) - Cas de sur-apprentissage}
+Toutes les chances d'être en sur-apprentissage sont avec l'approche des fenêtres de Parzen. En effet, quand $\sigma$ est très proche de zéro, la capacité est trop forte relativement à la quantité de données. Ainsi, le modèle va être collé aux données d'entrainement. Cela va créer des piques sur les points d'entrainement. 
 
-\subsubsection{(c)}
-Les fenêtres de Parzen sont non-paramétrique, c'est-à-dire qu'il n'y a pas de supposition sur la forme de la fonction cible. Tandis que, pour la densité paramétrique Gaussienne, on suppose que la fonction de densité est connue et on cherche à estimer les paramètre de la distribution. En d'autre mots, l'utilisateur doit fixer le $\sigma$ lorsqu'il utilise les fenêtre de parzen et il doit valider sont choix en utilissant la méthode de validation croisée. Dans l'autre cas, rien n'est fixée par l'utilisateur,  $\sigma$ est inféré par l'algorithme.
+\subsubsection{c) - Hyper-paramètre vs paramètre}
+Les fenêtres de Parzen sont non-paramétrique, c'est-à-dire qu'il n'y a pas de forte supposition sur la forme de la fonction cible. Tandis que, pour la densité paramétrique Gaussienne, on suppose que la fonction de densité est connue et on cherche à estimer les paramètres de la distribution. En d'autre mots, l'utilisateur doit fixer le $\sigma$ lorsqu'il utilise les fenêtre de parzen et il doit valider son choix en utilisant la méthode de validation croisée. Dans l'autre cas, rien n'est fixée par l'utilisateur,  $\sigma$ est estimé par l'algorithme.
+\\
+
+\section{Question 4}
+\subsection{4.3 Densité 1D}
+\subsubsection{f) - Choix de $\sigma$}
+Le premier sigma est trop petit, car il suit trop les points des données d'entrainement.
+Alors, la courbe résultante n'est pas lisse et change de valeur brusquement (exemple: x=5.4 et x=5.6).
+Le deuxième sigma est trop grand, car la courbe ne capture pas les subtilités des données et elle ne forme qu'une large cloche.
+Le troisième sigma représente un meilleur sigma, car la courbe montre quelques subtilités des données tout en restant lisse
+et sans avoir de grosses variances de densité entre des valeurs proches.
+
+\subsection{4.4 Densité 2D}
+\subsubsection{e) - Choix de $\sigma$}
+Le premier sigma est trop petit, car le modèle apprend seulement les points des données d'entrainement et ne généralise pas.
+Alors, le modèle encercle chacune des données d'entrainement.
+Le deuxième sigma est trop grand, car le modèle ne fait que des cercles réguliers centrés sur la moyenne. Il ne capture pas
+de subtilités.
+Le troisième sigma est meilleur, car le modèle apprend à suivre les points sans juste mémoriser les points. 
+Les cercles représentent bien une généralisation de la distribution des points d'entrainement.
 \end{document}
