@@ -52,7 +52,7 @@
 
 	$\theta = \{ w, b\}$ où w est le vecteurs des poids donnés à chaque 'features' et b est le biais. 
 	\begin{eqs*}
-		\theta = \{w, b\}, w \in \mathbb{R}^{d}, b \in \mathbb{R}
+		\theta \in \mathbb{R}^{d+1}, w \in \mathbb{R}^{d}, b \in \mathbb{R}
 	\end{eqs*}
 
 \subsection{2. Habituellement, le coût utilisé pour une régresion linéaire est l'erreur quadratique. Le rique empirique $\hat{R}$ sur $D_{n}$ est la somme
@@ -68,50 +68,49 @@ Exprimer ce problème de minimisation}
 	\[\theta^{*} = \argmin_{\theta} \hat{R} = \argmin_{\theta} \sum_{i=1}^{n} (f_{\theta}(x^{(i)}) - t^{(i)})^{2}\] \\
 	Avec la régression linéaire, il suffit de résoudre analytiquement :	
 	\begin{eqs*}	
-		\nabla \hat{R}(\theta) = \frac{\delta\hat{R}}{\delta\theta}(\theta^{*}) = 0
+		\nabla \hat{R}(\theta) = \frac{\partial\hat{R}}{\partial \theta}(\theta^{*}) = 0
 	\end{eqs*}
 
 
 \subsection{4. Exprimer le gradient du risque empirique}
 	\begin{align}
-	\nabla \hat{R}(\theta) = \frac{\delta\hat{R}}{\delta\theta}(\theta) &= \begin{bmatrix}    														        													\frac{\delta\hat{R}}{\delta\theta_{0}}(\theta) \\
-           														\frac{\delta\hat{R}}{\delta\theta_{1}}(\theta) \\
+	\nabla \hat{R}(\theta) = \frac{\partial\hat{R}}{\partial\theta}(\theta) &= \begin{bmatrix}    														        													\frac{\partial\hat{R}}{\partial\theta_{0}}(\theta) \\
+           														\frac{\partial\hat{R}}{\partial\theta_{1}}(\theta) \\
 															\vdots \\
-           														\frac{\delta\hat{R}}{\delta\theta_{d}}(\theta)
+           														\frac{\partial\hat{R}}{\partial\theta_{d}}(\theta)
          														\end{bmatrix}
 	\end{align}
 	
 	\begin{eqs*}	
-		= \frac{d}{d\theta} (\sum_{i=1}^{n} (f_{\theta}(x^{(i)}) - t^{(i)})^{2})
+		= \frac{\partial}{\partial\theta} (\sum_{i=1}^{n} (f_{\theta}(x^{(i)}) - t^{(i)})^{2})
 	\end{eqs*}
 
 	\begin{eqs*}
-		= \frac{d}{d\theta} (\sum_{i=1}^{n} (\begin{bmatrix}
+		= \frac{\partial}{\partial\theta} (\sum_{i=1}^{n} (\begin{bmatrix}
 									\theta_{1} \\
 									\theta_{2} \\
 									\vdots \\
 									\theta_{d}
-									\end{bmatrix}^{T}.x^{(i)} + \theta_{0} = t^{(i)})^{2})
+									\end{bmatrix}^{T}x^{(i)} + \theta_{0} - t^{(i)})^{2})
 	\end{eqs*}
 
 	\begin{eqs*}
-		= \frac{d}{d\theta} (\sum_{i=1}^{n}(w^{T}x^{(i)} + b - t^{(i)})^{2})
+		= \frac{\partial}{\partial\theta} (\sum_{i=1}^{n}(w^{T}x^{(i)} + b - t^{(i)})^{2})
 	\end{eqs*}
 
 	\begin{eqs*}
 		=  \begin{bmatrix}
 			\sum_{i=1}^{n} 2(w^{T}x^{(i)} + b - t^{(i)}) \\
-			\sum_{i=1}^{n} 2(w^{T}x^{(i)} + b - t^{(i)}).x_{1}^{(i)} \\
-			\sum_{i=1}^{n} 2(w^{T}x^{(i)} + b - t^{(i)}).x_{2}^{(i)} \\
+			\sum_{i=1}^{n} 2(w^{T}x^{(i)} + b - t^{(i)})x_{1}^{(i)} \\
+			\sum_{i=1}^{n} 2(w^{T}x^{(i)} + b - t^{(i)})x_{2}^{(i)} \\
 			\vdots \\
-			\sum_{i=1}^{n} 2(w^{T}x^{(i)} + b - t^{(i)}).x_{d}^{(i)}
+			\sum_{i=1}^{n} 2(w^{T}x^{(i)} + b - t^{(i)})x_{d}^{(i)}
 			\end{bmatrix}
 	\end{eqs*}
 	
 
 \subsection{5. Expliquer la relation entre le gradient du risque empirique et les erreurs du modèle sur l'ensemble d'entraînement}
-	Le gradient du risque empirique permet de trouver le minimum global des erreurs du modèle sur l'ensemble d'entraînement. Autrement dit,
-	le point où le gradient est égal à 0 est le point où les erreurs du modèle sont les plus petites sur l'ensemble d'entraînement.
+	Le gradient du risque empirique permet de trouver le minimum global des erreurs du modèle sur l'ensemble d'entraînement. Autrement dit, vu que ce cas-ci est convexe ,le point où le gradient est égal à 0 est le point où les erreurs du modèle sont les plus petites sur l'ensemble d'entraînement.
 
 
 \section{Question 1.2 Régression linéaire régularisée (“ridge regression”)}
@@ -119,46 +118,43 @@ Exprimer ce problème de minimisation}
 \subsection{1. Exprimez le gradient du risque régularisé. En quoi diffère-t-il du gradient du risque empirique non régularisé?}
 
 	\begin{eqs*}
-		\nabla\widetilde{R}(\theta) = \frac{\delta\widetilde{R}(\theta)}{\delta\theta}
+		\nabla\widetilde{R}(\theta) = \frac{\partial\widetilde{R}(\theta)}{\partial\theta}
 	\end{eqs*}
 
 	\begin{eqs*}
-		= \frac{\delta}{\delta\theta}(\hat{R} + \lambda\mathcal{L}(\theta))
+		= \frac{\partial}{\partial\theta}(\hat{R} + \lambda\mathcal{L}(\theta))
 	\end{eqs*}
 
 	\begin{eqs*}
-		= \frac{\delta}{\delta\theta}(\sum_{i=1}^{n}(w^{T}x^{(i)} + b - t^{(i)})^{2} + \lambda\sum_{k=1}^{d} w_{k}^{2})
+		= \frac{\partial}{\partial\theta}(\sum_{i=1}^{n}(w^{T}x^{(i)} + b - t^{(i)})^{2} + \lambda\sum_{k=1}^{d} w_{k}^{2})
 	\end{eqs*}
 
 	\begin{eqs*}
-		= \frac{\delta}{\delta\theta}(\sum_{i=1}^{n}(w^{T}x^{(i)} + b - t^{(i)})^{2}) + \frac{\delta}{\delta\theta}(\lambda\sum_{k=1}^{d} w_{k}^{2})
+		= \frac{\partial}{\partial\theta}(\sum_{i=1}^{n}(w^{T}x^{(i)} + b - t^{(i)})^{2}) + \frac{\partial}{\partial\theta}(\lambda\sum_{k=1}^{d} w_{k}^{2})
 	\end{eqs*}
 
 	\begin{eqs*}
-		= \nabla\hat{R}(\theta) + \frac{\delta}{\delta\theta}\lambda(\sum_{k=1}^{d} w_{k}^{2})
+		= \nabla\hat{R}(\theta) + \frac{\partial}{\partial\theta}\lambda(\sum_{k=1}^{d} w_{k}^{2})
 	\end{eqs*}	
 	
-	Donc, la différence entre $\nabla\widetilde{R}(\theta)$ et $\nabla\hat{R}(\theta)$ est l'addition de $\frac{\delta}{\delta\theta}\lambda(\sum_{k=1}^{d} w_{k}^{2})$
+	Donc, la différence entre $\nabla\widetilde{R}(\theta)$ et $\nabla\hat{R}(\theta)$ est l'addition de $\frac{\partial}{\partial\theta}\lambda(\sum_{k=1}^{d} w_{k}^{2})$
 
 
 \subsection{2. Donner le pseudo code détaillé de l'algorithme qui cherche les paramètres optimaux pour minimiser $\widetilde{R}$ par descente de gradient batch.}
-	\begin{eqs*}
-		\text{loop } \theta \leftarrow \theta - \eta \frac{\delta\widetilde{R}}{\delta \theta}
-	\end{eqs*}	
-
-	\begin{eqs*}
-		 = \theta - \eta[\sum_{i=1}^{n} \frac{\delta}{\delta\theta}(w^{T}x^{(i)} + b - t^{(i)})^{2} + \lambda \frac{\delta}{\delta\theta}(\sum_{k=1}^{d} w_{k}^{2})]
-	\end{eqs*}
-
-L'algorithme est donc: \\
+	
 $\theta$ = initialize\_randomly() \\
 stop = False \\
 while not stop: \\
-\-\hspace{1cm} gradient = $\sum_{i=1}^{n} \frac{\delta}{\delta\theta}(w^{T}x^{(i)} + b - t^{(i)})^{2} + \lambda \frac{\delta}{\delta\theta}(\sum_{k=1}^{d} w_{k}^{2})$ \\
+\-\hspace{1cm} gradient = $\sum_{i=1}^{n} \frac{\partial}{\partial\theta}(w^{T}x^{(i)} + b - t^{(i)})^{2} + \lambda \frac{\partial}{\partial\theta}(\sum_{k=1}^{d} w_{k}^{2})$ \\
 \-\hspace{1cm} $\theta =\theta - \eta.\text{gradient}$ \\
 \-\hspace{1cm} stop = || gradient || < $\varepsilon$
 
-\subsection{3.exprimer le risque empirique et son gradient sous forme matricielle}
+\subsection{3. Exprimer le risque empirique et son gradient sous forme matricielle}
+	\begin{eqs*} 
+		\hat{R} = (Xw-t)^{2} \\
+		\nabla\hat{R}(\theta) = 2(X^{T}(Xw-t))
+	\end{eqs*}
+\subsection{4. Donner la solution analytique sous forme matricielle}
 	\begin{eqs*}
 		\theta^{*} = (X^{T}X)^{-1}X^{T}t
 	\end{eqs*}
@@ -181,7 +177,7 @@ on utilise $\phi = \phi_{poly^{k}}$}
 
 \subsection{2. Préciser quels sont les paramètres et leur dimensionalité}
 
-Les paramètres sont \textbf{w} et \textbf{b}. Pour $\phi_{poly^{k}} \in \mathbb{R}^{k}$, $w \in \mathbb{R}^{k}$ est un vecteur. $b \in mathbb{R}$ est un scalaire.
+Les paramètres sont \textbf{w} et \textbf{b}. Pour $\phi_{poly^{k}} \in \mathbb{R}^{k}$, $w \in \mathbb{R}^{k}$ est un vecteur. $b \in \mathbb{R}$ est un scalaire.
 
 
 
