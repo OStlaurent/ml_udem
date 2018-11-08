@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 np.random.seed(3)
 
@@ -143,7 +144,7 @@ class Neural_network:
         grads = grads / minibatch_inputs.shape[0]
         self.gradient_descent(grads[0], grads[1], grads[2], grads[3])
 
-    def predict(self, x, y):
+    def predict(self, x):
         x =  x.reshape((self.d, 1))
         self.fprop(x)
         # print(self.os, y)
@@ -269,3 +270,21 @@ os = softmax(oa)
 #     if model.predict(test_inputs[i],test_labels[i]) == test_labels[i]:
 #         correct = correct + 1
 # print('Taux de classification correcte:',correct / test_inputs.shape[0], '%')
+
+#decision regions
+def plot_decision_region(model, params, n=50):
+    n=n
+    x = np.linspace(-1,1,n)
+    y = np.linspace(-1,1,n)
+    xx, yy = np.meshgrid(x,y)
+    grid_dataset = np.column_stack((xx.ravel(),yy.ravel()))
+    pred = []
+    for e in grid_dataset:
+        pred.append(model.predict(e))
+    pred = np.array(pred)
+    pred = pred.reshape(xx.shape)
+    plt.contourf(xx,yy,pred)
+    plt.title('decision region ' + params)
+    plt.show()
+
+plot_decision_region(model, '4 hidden, 10 epochs')
