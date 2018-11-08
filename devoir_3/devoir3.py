@@ -150,6 +150,13 @@ class Neural_network:
         # print(self.os, y)
         return float(np.argmax(self.os))
 
+    def score(self,test_inputs, test_labels):
+        # Calcul du pourcentage d'exemple qui se fait correctement classifier
+        correct = 0
+        for i in range(test_inputs.shape[0]):
+            if model.predict(test_inputs[i]) == test_labels[i]:
+                correct = correct + 1
+        print('Taux de classification correcte:', correct / test_inputs.shape[0], '%')
 
 def softmax(a):
     """
@@ -264,15 +271,9 @@ os = softmax(oa)
 
 
 
-## Calcul du pourcentage d'exemple qui se fait correctement classifier
-# correct = 0
-# for i in range(test_inputs.shape[0]):
-#     if model.predict(test_inputs[i],test_labels[i]) == test_labels[i]:
-#         correct = correct + 1
-# print('Taux de classification correcte:',correct / test_inputs.shape[0], '%')
 
 #decision regions
-def plot_decision_region(model, params, n=50):
+def plot_decision_region(model, params = '', n=50):
     n=n
     x = np.linspace(-1,1,n)
     y = np.linspace(-1,1,n)
@@ -287,4 +288,22 @@ def plot_decision_region(model, params, n=50):
     plt.title('decision region ' + params)
     plt.show()
 
+
 plot_decision_region(model, '4 hidden, 10 epochs')
+model.score(test_inputs, test_labels)
+
+
+model2 = Neural_network(2,3,2, epoch=10, step_size=0.00001, lambda11=0,lambda12=0,lambda21=0,lambda22=0)
+model2.train(train_inputs, train_labels)
+model2.score(test_inputs, test_labels)
+plot_decision_region(model2, '3 hidden, step size = 0.00001')
+
+model3 = Neural_network(2,3,2, epoch=10, step_size=0.00001, lambda11=1,lambda12=0,lambda21=0,lambda22=0)
+model3.train(train_inputs, train_labels)
+model3.score(test_inputs, test_labels)
+plot_decision_region(model3, '3 hidden, step size = 0.00001, lambda11=1')
+
+model4 = Neural_network(2,3,2, epoch=10, step_size=0.00001, lambda11=0,lambda12=1,lambda21=0,lambda22=0)
+model4.train(train_inputs, train_labels)
+model4.score(test_inputs, test_labels)
+plot_decision_region(model4, '3 hidden, step size = 0.00001 lambda12=1')
