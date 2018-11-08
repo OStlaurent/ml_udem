@@ -4,6 +4,7 @@ np.random.seed(3)
 
 circles = np.loadtxt('circles.txt')
 
+#from tp
 # separate into train and test
 n_classes = 2
 n_train = 880
@@ -50,36 +51,12 @@ class Neural_network:
         #TODO fix loss or remove it
         self.ha = self.b1 + np.dot(self.w1,x)
         self.hs = self.ha.clip(min=0)
-        #self.hs = np.multiply(self.ha, (self.ha > 0))
         self.oa = self.b2 + np.dot(self.w2,self.hs)
         self.os = softmax(self.oa)
         # if y is not None:
         #     #TODO add regulation
+        #     #correct equation?
         #     self.loss += np.log(np.sum(np.exp(self.oa))) - self.os[y]
-
-    # def fprop_test(self,input,y = None):
-    #     #TODO fix loss
-    #     x = input.reshape((self.d,1))
-    #     self.ha = self.b1 + np.dot(self.w1,x)
-    #     self.hs = self.ha.clip(min=0)
-    #     #self.hs = np.multiply(self.ha, (self.ha > 0))
-    #     self.oa = self.b2 + np.dot(self.w2,self.hs)
-    #     self.os = softmax(self.oa)
-
-    # def fprop_matrix(self,x,y = None):
-    #     # TO VERIFY if correct and do the loss part
-    #     #https://www.coursera.org/lecture/neural-networks-deep-learning/vectorizing-across-multiple-examples-ZCcMM
-    #     x = x.T
-    #     self.ha = self.b1 + np.dot(self.w1,x)
-    #     self.hs = np.multiply(self.ha, (self.ha > 0))
-    #     self.oa = self.b2 + np.dot(self.w2,self.hs)
-    #     self.os = softmax(self.oa)
-    #     #TODO fix
-    #     if y is not None:
-    #         self.loss += np.log(np.sum(np.exp(self.oa))) - os[y]
-
-    # def bprop_matrix(self,x,y):
-    #     pass
 
 
     def bprop(self,x,y):
@@ -89,7 +66,6 @@ class Neural_network:
         for i in range(self.hs.shape[0]):
             grad_w2[y][i] - self.hs[i]
         grad_hs = np.dot(self.w2.T,self.os) - self.w2[y,:].reshape((self.dh,1))
-        # vector_indicator = np.array([1 if e > 0 else 0 for e in np.nditer(self.hs)]).reshape(self.hs.shape)
         indicator = np.sign(self.hs).clip(min=0)
         grad_ha = np.multiply(grad_hs,indicator)
         grad_b1 = grad_ha
@@ -104,17 +80,37 @@ class Neural_network:
 
     def gradient_check(self,x,y):
         epsilon = 0.0001
+        #y = y.astype(int)
+        x = x.reshape((self.d, 1))
+        self.fprop(x,y)
+        f1 = np.array([self.b1, self.w1, self.b2, self.w2])
+        loss1 = - np.log(self.os[y])
+        self.b1 = self.b1 - epsilon
+        self.w1 = self.w1 - epsilon
+        self.b2 = self.b2 - epsilon
+        self.w2 = self.w2 - epsilon
+        self.fprop(x, y)
+        f2 = np.array([self.b1, self.w1, self.b2, self.w2])
+        loss2 = - np.log(self.os[y])
 
-        pass
+        self.b1 = self.b1 + 2*epsilon
+        self.w1 = self.w1 + 2*epsilon
+        self.b2 = self.b2 + 2*epsilon
+        self.w2 = self.w2 + 2*epsilon
+        #estimate = (loss1 - loss2)/epsilon
+        #print(estimate)
+        estimate = f1 - f2 / epsilon
+        computed = self.bprop(x,y)
+        print(computed/estimate)
 
-    def features_dimension_check(self, train_inputs):
-        #correct the network if the number of features doesnt match with the number of neurons in the input layer
-        if train_inputs.shape[1] != self.d:
-            self.__init__(train_inputs.shape[1], self.dh, self.m, self.nb_iter, self.step_size, self.k, self.lambda11,
-                          self.lambda12, self.lambda21, self.lambda22)
+    # def features_dimension_check(self, train_inputs):
+    #     #correct the network if the number of features doesnt match with the number of neurons in the input layer
+    #     if train_inputs.shape[1] != self.d:
+    #         self.__init__(train_inputs.shape[1], self.dh, self.m, self.nb_iter, self.step_size, self.k, self.lambda11,
+    #                       self.lambda12, self.lambda21, self.lambda22)
 
     def train(self,train_inputs, train_labels):
-        self.features_dimension_check(train_inputs)
+        # self.features_dimension_check(train_inputs)
         train_labels = train_labels.astype(int)
         for l in range(self.epoch):
             #separate the dataset in minibatch with k examples
@@ -183,8 +179,8 @@ def initialize_weight(n_input,n2):
 model = Neural_network(2,4,2, epoch=10, step_size=0.01, lambda11=0,lambda12=0,lambda21=0,lambda22=0)
 model.train(train_inputs, train_labels)
 
-inputs = [[-0.42091717, -0.68031517],[-0.97401192, -0.22649677],[ 0.7444175,  -0.66771445]]
-labels = [1., 0., 0.]
+# test_inputs[0:3] == [[-0.42091717, -0.68031517],[-0.97401192, -0.22649677],[ 0.7444175,  -0.66771445]]
+# test_labels[0:3] = [1., 0., 0.]
 
 # print(model.b1)
 b1 = model.b1
@@ -202,7 +198,10 @@ w2 = model.w2
 x = test_inputs[0]
 x =  x.reshape((2, 1))
 
-y = test_labels[0]
+y = int(test_labels[0])
+
+model.gradient_check(x,y)
+
 
 #fprop
 ha = b1 + np.dot(w1, x)
@@ -224,14 +223,14 @@ os = softmax(oa)
 step_size = 0.01
 #bprop
 grad_b2 = os - np.eye(2)[y].reshape((2, 1))
-print(grad_b2)
+#print(grad_b2)
 # grad_w2 = np.outer(self.os,self.hs) - np.concatenate((np.zeros((y-1,self.dh)),self.hs.reshape((1,self.dh)),np.zeros((self.m-y,self.dh))))
 grad_w2 = np.outer(os, hs)
 for i in range(hs.shape[0]):
     grad_w2[y][i] - hs[i]
 grad_hs = np.dot(w2.T, os) - w2[y, :].reshape((4, 1))
 # vector_indicator = np.array([1 if e > 0 else 0 for e in np.nditer(self.hs)]).reshape(self.hs.shape)
-indicator = np.sign(self.hs).clip(min=0)
+indicator = np.sign(hs).clip(min=0)
 grad_ha = np.multiply(grad_hs, indicator)
 grad_b1 = grad_ha
 grad_w1 = np.outer(grad_ha, x)
@@ -259,17 +258,14 @@ oa = b2 + np.dot(w2, hs)
 os = softmax(oa)
 #print(os)
 
-#print(initialize_weight(2,4))
 
 
 
 
 
-
-
-
+## Calcul du pourcentage d'exemple qui se fait correctement classifier
 # correct = 0
 # for i in range(test_inputs.shape[0]):
 #     if model.predict(test_inputs[i],test_labels[i]) == test_labels[i]:
 #         correct = correct + 1
-# print(correct / test_inputs.shape[0], '% correct')
+# print('Taux de classification correcte:',correct / test_inputs.shape[0], '%')
