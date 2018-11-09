@@ -1,7 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+#Maxime Daigle & Olivier St-Laurent
+
 np.random.seed(3)
+
+#remove error when divide 0 by 0 when doing the finite difference gradient check
+np.seterr(divide='ignore', invalid='ignore')
+
 
 circles = np.loadtxt('circles.txt')
 
@@ -40,7 +46,6 @@ class Neural_network:
         self.lambda12 = lambda12
         self.lambda21 = lambda21
         self.lambda22 = lambda22
-        self.loss = 0
 
     def weight_decay(self,w):
         if w == 'w1':
@@ -54,10 +59,6 @@ class Neural_network:
         self.hs = self.ha.clip(min=0)
         self.oa = self.b2 + np.dot(self.w2,self.hs)
         self.os = softmax(self.oa)
-        # if y is not None:
-        #     #TODO add regulation
-        #     #correct equation?
-        #     self.loss += np.log(np.sum(np.exp(self.oa))) - self.os[y]
 
 
     def bprop(self,x,y):
@@ -65,7 +66,7 @@ class Neural_network:
         # grad_w2 = np.outer(self.os,self.hs) - np.concatenate((np.zeros((y-1,self.dh)),self.hs.reshape((1,self.dh)),np.zeros((self.m-y,self.dh))))
         grad_w2 = np.outer(self.os, self.hs)
         for i in range(self.hs.shape[0]):
-            grad_w2[y][i] - self.hs[i]
+            grad_w2[y][i] = grad_w2[y][i] - self.hs[i]
         grad_hs = np.dot(self.w2.T,self.os) - self.w2[y,:].reshape((self.dh,1))
         indicator = np.sign(self.hs).clip(min=0)
         grad_ha = np.multiply(grad_hs,indicator)
@@ -79,36 +80,139 @@ class Neural_network:
         self.w2 = self.w2 - self.step_size * (grad_w2 + self.weight_decay('w2'))
         self.b2 = self.b2 - self.step_size * grad_b2
 
-    def gradient_check(self,x,y):
-        epsilon = 0.0001
-        #y = y.astype(int)
+    def gradient_check(self,x,y, debug = False):
+        epsilon = 0.00001
+        y = int(y)
         x = x.reshape((self.d, 1))
+
         self.fprop(x,y)
-        f1 = np.array([self.b1, self.w1, self.b2, self.w2])
-        loss1 = - np.log(self.os[y])
-        self.b1 = self.b1 - epsilon
-        self.w1 = self.w1 - epsilon
-        self.b2 = self.b2 - epsilon
-        self.w2 = self.w2 - epsilon
-        self.fprop(x, y)
-        f2 = np.array([self.b1, self.w1, self.b2, self.w2])
-        loss2 = - np.log(self.os[y])
-
-        self.b1 = self.b1 + 2*epsilon
-        self.w1 = self.w1 + 2*epsilon
-        self.b2 = self.b2 + 2*epsilon
-        self.w2 = self.w2 + 2*epsilon
-        #estimate = (loss1 - loss2)/epsilon
-        #print(estimate)
-        estimate = f1 - f2 / epsilon
         computed = self.bprop(x,y)
-        print(computed/estimate)
 
-    # def features_dimension_check(self, train_inputs):
-    #     #correct the network if the number of features doesnt match with the number of neurons in the input layer
-    #     if train_inputs.shape[1] != self.d:
-    #         self.__init__(train_inputs.shape[1], self.dh, self.m, self.nb_iter, self.step_size, self.k, self.lambda11,
-    #                       self.lambda12, self.lambda21, self.lambda22)
+        #gradient check for b1
+        grad_b1_check = np.zeros((self.dh,1))
+        for i in range(self.b1.shape[0]):
+            b1plus = np.copy(self.b1)
+            b1plus[i] = self.b1[i] + epsilon
+            b1minus = np.copy(self.b1)
+            b1minus[i] = self.b1[i] - epsilon
+            grad_b1_check[i] = (self.loss_check(x=x, y=y, b1=b1plus) - self.loss_check(x=x, y=y, b1=b1minus)) / (2*epsilon)
+
+        if debug:
+            print("ratio computed grad_b1 / estimation grad_b1")
+            print(computed[0] / grad_b1_check)
+            print('computed grad_b1')
+            print(computed[0])
+            print('grad_b1')
+            print(grad_b1_check)
+            print()
+
+        # gradient check for b2
+        grad_b2_check = np.zeros(self.b2.shape)
+        for i in range(self.b2.shape[0]):
+            b2plus = np.copy(self.b2)
+            b2plus[i] = self.b2[i] + epsilon
+            b2minus = np.copy(self.b2)
+            b2minus[i] = self.b2[i] - epsilon
+            grad_b2_check[i] = (self.loss_check(x=x, y=y, b2=b2plus) - self.loss_check(x=x, y=y, b2=b2minus)) / (2 * epsilon)
+
+        if debug:
+            print("ratio computed grad_b2 / estimation grad_b2")
+            print(computed[2] / grad_b2_check)
+            print('computed grad_b2')
+            print(computed[2])
+            print('grad_b2')
+            print(grad_b2_check)
+            print()
+
+        #gradient check for w1
+        grad_w1_check = np.zeros(self.w1.shape)
+        for i in range(self.w1.shape[0]):
+            for j in range(self.w1.shape[1]):
+                w1plus = np.copy(self.w1)
+                w1plus[i,j] = self.w1[i,j] + epsilon
+                w1minus = np.copy(self.w1)
+                w1minus[i,j] = self.w1[i,j] - epsilon
+                grad_w1_check[i,j] = (self.loss_check(x=x, y=y, w1=w1plus) - self.loss_check(x=x, y=y, w1=w1minus)) / (2*epsilon)
+
+        if debug:
+            print("ratio computed grad_w1 / estimation grad_w1")
+            print(computed[1] / grad_w1_check)
+            print('computed grad_w1')
+            print(computed[1])
+            print('grad_w1')
+            print(grad_w1_check)
+            print()
+
+        # gradient check for w2
+        grad_w2_check = np.zeros(self.w2.shape)
+        for i in range(self.w2.shape[0]):
+            for j in range(self.w2.shape[1]):
+                w2plus = np.copy(self.w2)
+                w2plus[i, j] = self.w2[i, j] + epsilon
+                w2minus = np.copy(self.w2)
+                w2minus[i, j] = self.w2[i, j] - epsilon
+                grad_w2_check[i, j] = (self.loss_check(x=x, y=y, w2=w2plus) - self.loss_check(x=x, y=y, w2=w2minus)) / (2*epsilon)
+
+        if debug:
+            print("ratio computed grad_w2 / estimation grad_w2")
+            print(computed[3] / grad_w2_check)
+            print('computed grad_w2')
+            print(computed[3])
+            print('grad_w2')
+            print(grad_w2_check)
+            print()
+
+        return np.array([grad_b1_check, grad_w1_check, grad_b2_check, grad_w2_check])
+
+    def loss_check(self, x, y, b1 = None, b2 = None, w1 = None, w2 = None):
+        if b1 is None:
+            b1 = self.b1
+        if b2 is None:
+            b2 = self.b2
+        if w1 is None:
+            w1 = self.w1
+        if w2 is None:
+            w2 = self.w2
+        ha = b1 + np.dot(w1, x)
+        hs = ha.clip(min=0)
+        oa = b2 + np.dot(w2, hs)
+        os = softmax(oa)
+        return - np.log(os[y])
+
+    def gradient_check_minibatch(self, minibatch_inputs,minibatch_labels):
+        computed = self.train_minibatch(minibatch_inputs, minibatch_labels.astype(int), True)
+
+        total_b1 = np.zeros((self.dh, 1))
+        total_w1 = np.zeros((self.dh, self.d))
+        total_b2 = np.zeros((self.m, 1))
+        total_w2 = np.zeros((self.m, self.dh))
+        grads = np.array([total_b1, total_w1, total_b2, total_w2])
+
+        # sum gradient from the k examples
+        for i in range(minibatch_inputs.shape[0]):
+            grads += self.gradient_check(x=minibatch_inputs[i], y=minibatch_labels[i])
+
+        # use average estimated gradients of the minibatch
+        grads = grads / minibatch_inputs.shape[0]
+
+        s = ['grad_b1', 'grad_w1', 'grad_b2', 'grad_w2']
+        for j in range(4):
+            print("ratio computed "+ s[j] + " / estimation " + s[j])
+            print(computed[j] / grads[j])
+            print('computed ' + s[j])
+            print(computed[j])
+            print(s[j])
+            print(grads[j])
+            print()
+
+        # print("ratio computed grad_w2 / estimation grad_w2")
+        # print(computed[3] / grads[3])
+        # print('computed grad_w2')
+        # print(computed[3])
+        # print('grad_w2')
+        # print(grads[3])
+        # print()
+
 
     def train(self,train_inputs, train_labels):
         # self.features_dimension_check(train_inputs)
@@ -126,13 +230,13 @@ class Neural_network:
                 s = (train_inputs.shape[0] // self.k) * self.k
                 self.train_minibatch(minibatch_inputs = train_inputs[s:, :], minibatch_labels = train_labels[s:])
 
-    def train_minibatch(self, minibatch_inputs, minibatch_labels):
+    def train_minibatch(self, minibatch_inputs, minibatch_labels, debug = False):
         total_b1 = np.zeros((self.dh,1))
         total_w1 = np.zeros((self.dh,self.d))
         total_b2 = np.zeros((self.m,1))
         total_w2 = np.zeros((self.m,self.dh))
+        #print(total_b1.shape, total_w1.shape, total_b2.shape, total_w2.shape)
         grads = np.array([total_b1, total_w1, total_b2, total_w2])
-        #grads = np.array([total_b1, total_w1, total_b2, total_w2]).reshape((4,1))
 
         # sum gradient from the k examples
         for j in range(minibatch_inputs.shape[0]):
@@ -142,6 +246,8 @@ class Neural_network:
 
         # use average gradients of the minibatch
         grads = grads / minibatch_inputs.shape[0]
+        if debug:
+            return grads
         self.gradient_descent(grads[0], grads[1], grads[2], grads[3])
 
     def predict(self, x):
@@ -154,9 +260,10 @@ class Neural_network:
         # Calcul du pourcentage d'exemple qui se fait correctement classifier
         correct = 0
         for i in range(test_inputs.shape[0]):
-            if model.predict(test_inputs[i]) == test_labels[i]:
+            if self.predict(test_inputs[i]) == test_labels[i]:
                 correct = correct + 1
-        print('Taux de classification correcte:', correct / test_inputs.shape[0], '%')
+        result = 'Taux de classification correcte: ' + str((correct / test_inputs.shape[0]) * 100) + '%'
+        return result
 
 def softmax(a):
     """
@@ -181,99 +288,12 @@ def initialize_weight(n_input,n2):
     :param n2: number of rows = number of neurons in the layer 'after' or current layer = number of neurons that receive inputs
     :return: weights matrix
     """
-    return np.random.uniform(-1/n_input,1/n_input,(n2,n_input))
-
-
-model = Neural_network(2,4,2, epoch=10, step_size=0.01, lambda11=0,lambda12=0,lambda21=0,lambda22=0)
-model.train(train_inputs, train_labels)
-
-# test_inputs[0:3] == [[-0.42091717, -0.68031517],[-0.97401192, -0.22649677],[ 0.7444175,  -0.66771445]]
-# test_labels[0:3] = [1., 0., 0.]
-
-# print(model.b1)
-b1 = model.b1
-# print('_________________')
-# print(model.w1)
-w1 = model.w1
-# print('_________________')
-# print(model.b2)
-b2 = model.b2
-# print('_________________')
-# print(model.w2)
-w2 = model.w2
-# print('_________________')
-
-x = test_inputs[0]
-x =  x.reshape((2, 1))
-
-y = int(test_labels[0])
-
-model.gradient_check(x,y)
-
-
-#fprop
-ha = b1 + np.dot(w1, x)
-#print(b1)
-#print(np.dot(w1, x), 'w1*x')
-#print(w1, 'w1')
-#print(ha)
-hs = ha.clip(min=0)
-#print(hs, 'hs')
-#print(w2)
-#print(b2)
-#print(np.dot(w2, hs), 'w2*hs')
-oa = b2 + np.dot(w2, hs)
-#print(oa)
-os = softmax(oa)
-#print(os)
-
-
-step_size = 0.01
-#bprop
-grad_b2 = os - np.eye(2)[y].reshape((2, 1))
-#print(grad_b2)
-# grad_w2 = np.outer(self.os,self.hs) - np.concatenate((np.zeros((y-1,self.dh)),self.hs.reshape((1,self.dh)),np.zeros((self.m-y,self.dh))))
-grad_w2 = np.outer(os, hs)
-for i in range(hs.shape[0]):
-    grad_w2[y][i] - hs[i]
-grad_hs = np.dot(w2.T, os) - w2[y, :].reshape((4, 1))
-# vector_indicator = np.array([1 if e > 0 else 0 for e in np.nditer(self.hs)]).reshape(self.hs.shape)
-indicator = np.sign(hs).clip(min=0)
-grad_ha = np.multiply(grad_hs, indicator)
-grad_b1 = grad_ha
-grad_w1 = np.outer(grad_ha, x)
-#return np.array([grad_b1, grad_w1, grad_b2, grad_w2])
-
-#gradient descent
-# w1 = w1 - self.step_size * (grad_w1 + self.weight_decay('w1'))
-# b1 = b1 - self.step_size * grad_b1
-# w2 = w2 - self.step_size * (grad_w2 + self.weight_decay('w2'))
-# b2 = b2 - self.step_size * grad_b2
-
-x = test_inputs[1]
-x =  x.reshape((2, 1))
-ha = b1 + np.dot(w1, x)
-#print(np.dot(w1, x), 'w1*x')
-#print(w1, 'w1')
-#print(ha)
-hs = ha.clip(min=0)
-#print(hs, 'hs')
-#print(w2)
-#print(np.dot(w2, hs), 'w2*hs')
-#print(b2)
-oa = b2 + np.dot(w2, hs)
-#print(oa)
-os = softmax(oa)
-#print(os)
-
-
-
-
-
-
+    n_input_sqrt = n_input**(0.5)
+    return np.random.uniform(-1/n_input_sqrt,1/n_input_sqrt,(n2,n_input))
 
 #decision regions
-def plot_decision_region(model, params = '', n=50):
+def plot_decision_region(model, params, n=50):
+    fig = plt.figure()
     n=n
     x = np.linspace(-1,1,n)
     y = np.linspace(-1,1,n)
@@ -285,25 +305,73 @@ def plot_decision_region(model, params = '', n=50):
     pred = np.array(pred)
     pred = pred.reshape(xx.shape)
     plt.contourf(xx,yy,pred)
-    plt.title('decision region ' + params)
+    fig.suptitle('decision region')
+    plt.title(params)
+    # plt.legend(labels = params)
     plt.show()
 
+model = Neural_network(2,10,2, epoch=10, step_size=0.01, lambda11=0,lambda12=0,lambda21=0,lambda22=0)
+model.train(train_inputs, train_labels)
 
-plot_decision_region(model, '4 hidden, 10 epochs')
-model.score(test_inputs, test_labels)
 
+# 1) in code above
 
-model2 = Neural_network(2,3,2, epoch=10, step_size=0.00001, lambda11=0,lambda12=0,lambda21=0,lambda22=0)
+# 2)
+print('Finite difference gradient check for 1 example')
+model_check_gradient = Neural_network(2,3,2, epoch=10, step_size=0.01, lambda11=0,lambda12=0,lambda21=0,lambda22=0)
+model_check_gradient.train(train_inputs, train_labels)
+result_gradient_check = model_check_gradient.gradient_check(test_inputs[0],test_labels[0], True)
+print()
+
+# 3) in code above
+
+# 4) Give the average estimated gradient on 10 examples, the average computed gradient on the same examples
+# and the ratio (computed average / estimation average)
+print('Finite difference gradient check for 10 examples')
+model_check_minibatch_gradient = Neural_network(2,3,2, epoch=10, k=10, step_size=0.01, lambda11=0,lambda12=0,lambda21=0,lambda22=0)
+model_check_minibatch_gradient.train(train_inputs,train_labels)
+minibatch_inputs = train_inputs[0:10]
+minibatch_labels = train_labels[0:10]
+
+model_check_minibatch_gradient.gradient_check_minibatch(minibatch_inputs,minibatch_labels)
+
+# 5)
+print('Model 1: 10 hidden neurons, 10 epoch, step size = 0.01')
+print(model.score(test_inputs, test_labels))
+print()
+plot_decision_region(model, '10 hiddens, 10 epoch, step size = 0.01')
+
+model2 = Neural_network(2,4,2, epoch=10, step_size=0.01, lambda11=0,lambda12=0,lambda21=0,lambda22=0)
 model2.train(train_inputs, train_labels)
-model2.score(test_inputs, test_labels)
-plot_decision_region(model2, '3 hidden, step size = 0.00001')
+print('Model 2: 4 hidden neurons, 10 epoch, step size = 0.01')
+print(model2.score(test_inputs, test_labels))
+print()
+plot_decision_region(model2, '4 hidden neurons')
 
-model3 = Neural_network(2,3,2, epoch=10, step_size=0.00001, lambda11=1,lambda12=0,lambda21=0,lambda22=0)
+model3 = Neural_network(2,10,2, epoch=10, step_size=0.01, lambda11=0.01,lambda12=0,lambda21=0,lambda22=0)
 model3.train(train_inputs, train_labels)
-model3.score(test_inputs, test_labels)
-plot_decision_region(model3, '3 hidden, step size = 0.00001, lambda11=1')
+print('Model 3: 10 hidden neurons, 10 epoch, step size = 0.01, lambda11 = 0.01')
+print(model3.score(test_inputs, test_labels))
+print()
+plot_decision_region(model3, '10 hidden neurons, lambda11 = 0.01')
 
-model4 = Neural_network(2,3,2, epoch=10, step_size=0.00001, lambda11=0,lambda12=1,lambda21=0,lambda22=0)
+model4 = Neural_network(2,10,2, epoch=10, step_size=0.01, lambda11=0,lambda12=0.01,lambda21=0,lambda22=0)
 model4.train(train_inputs, train_labels)
-model4.score(test_inputs, test_labels)
-plot_decision_region(model4, '3 hidden, step size = 0.00001 lambda12=1')
+print('Model 4: 10 hidden neurons, 10 epoch, step size = 0.01, lambda12 = 0.01')
+print(model4.score(test_inputs, test_labels))
+print()
+plot_decision_region(model4, 'lambda12 = 0.01')
+
+model5 = Neural_network(2,10,2, epoch=10, step_size=0.01, lambda11=0,lambda12=0,lambda21=0.01,lambda22=0)
+model5.train(train_inputs, train_labels)
+print('Model 5: 10 hidden neurons, 10 epoch, step size = 0.01, lambda21 = 0.01')
+print(model5.score(test_inputs, test_labels))
+print()
+plot_decision_region(model5, 'lambda21 = 0.01')
+
+model6 = Neural_network(2,10,2, epoch=10, step_size=0.01, lambda11=0,lambda12=0,lambda21=0,lambda22=0.01)
+model6.train(train_inputs, train_labels)
+print('Model 6: 10 hidden neurons, 10 epoch, step size = 0.01, lambda22 = 0.01')
+print(model6.score(test_inputs, test_labels))
+print()
+plot_decision_region(model6, 'lambda22 = 0.01')
