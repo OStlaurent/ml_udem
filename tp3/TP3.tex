@@ -82,7 +82,7 @@ sign(x) =
       0 &  x = 0 \\
       -1 &  x < 0 
    \end{cases}
-\Rightarrow sign(x) = ?_{\{x > 0\}}(x) - ?_{\{x < 0\}}(x)
+\Rightarrow sign(x) = \mathbb{1}_{\{x > 0\}}(x) - \mathbb{1}_{\{x < 0\}}(x)
 \]
 
 \subsection{6. Écrivez la dérivée de la fonction valeur absolue $abs(x) = |x|$}
@@ -116,7 +116,7 @@ rect'(x) =
      1 &  x > 0 \\
      0 &  x \leq 0 
    \end{cases}
-\Rightarrow rect'(x) = ?_{\{x > 0\}}(x)
+\Rightarrow rect'(x) = \mathbb{1}_{\{x > 0\}}(x)
 \]
 
 \subsection{8. Soit le carré de la norme $L_{2}$ d<un vecteur: $||x||_{2}^{2}= \sum_{i}x_{i}^{2}.$. Écrivez le vecteur gradient : $\frac{\partial||x||_{2}^{2}}{\partial x} = \dots$}
@@ -419,10 +419,171 @@ car $\frac{\partial L}{\partial b^{(2)}} = o^s-onehot_m()y$ et $frac{\partial L}
 
 où $O^s$ et $onehot_m(y)$ sont m x 1, $h^s$ est $d_h$ x $1$ et la matrice contenant que des zéros et les /l/ments de $h^s$ est m x $d_h$
 
- \subsection{11 Donner les expression correspondantes en numpy}
+ \subsection{11 Calculer $\frac{\partial L}{\partial h^s}$}
+$ \frac{\partial L}{\partial h_j^s} = \sum_{k=1}^m \frac{\partial L}{\partial O_k^a}\frac{\partial O_k^a}{\partial h_j^s} = \sum_{k=1}^m \frac{\partial L}{\partial O_k^a}\frac{\partial (b^{(2)}+\sum_{i=1}^{d_h}W_{ki}^{(2)}h_i^s)}{\partial h_j^s}$\\
+$ = \sum_{k=1}^m\frac{\partial L}{\partial O_k^a}W_{kj}^{(2)} =  O_1^sW_{1j}^{(2)}+O_2^sW_{2j}^{(2)}+\dots+(O_y^s-1)W_{yj}^{(2)}+\dots+O_m^sW_{mj}^{(2)}$\\
+
+$=\sum_{k=1}^mO_k^sW_{kj}^{(2)}-W_{yj}^{(2)}$\\
+Alors,\\
+
+\begin{align*} 
+\frac{\partial L}{\partial h^s}&= 
+	\left(
+     \begin{array}{r}
+         \sum_{k=1}^m O_k^s W_{k1}^{(2)} - W_{y1}^{(2)}\\
+ 	\sum_{k=1}^mO_k^sW_{k2}^{(2)}-W_{y2}^{(2)}\\
+        \dots  \dots\\ 
+ 	\sum_{k=1}^mO_k^sW_{kd_h}^{(2)}-W_{yd_h}^{(2)}\\
+       \end{array}
+     \right)
+\end{align*}
+
+ \subsection{12 Exprimer sous forme matricielle, préciser les dimensions, en numpy grad\_hs=?}
+
+$\frac{\partial L}{\partial h^s} = W^{(2)^{t}}O^s-W^{(2)}[y,:]^t$\\
+
+où $W^{(2)^t}$ est $d_h$ x $m$, $O^s$ est m x 1 et $w^{(2)}[y,:]^t$ est $d_h$ x $1$\\
+
+$grad\_hs = W2^t.os-W@[y-1,:]^t$\\
+
+
+ \subsection{13 Calculer $\frac{\partial L}{\partial h^a}$}
+
+$\frac{\partial L}{\partial h_j^a} = \frac{\partial L}{\partial h_j^s}*\frac{\partial h_j^s}{\partial h_j^a} =(\sum_{k-=1}^m O_k^s W_{kj}^{(2)} - W_{yj}^{(2)})\frac{\partial (rect(h_j^a)}{\partial h_j^a} =  (\sum_{k=1}^m O_k^s W_{kj}^{(2)}-W_{yj}^{(2)})\mathbb{1}_{\{h_j^a > 0\}}(h_j^a)$\\
 
 
 
+Alors,\\
+\begin{align*} 
+\frac{\partial L}{\partial dh^a}&= 
+	\left(
+     \begin{array}{r}
+         (\sum_{k=1}^m O_k^s W_{k1}^{(2)}-W_{y1}^{(2)})\mathbb{1}_{\{h_1^a > 0\}}(h_1^a)\\
+        \dots  \dots\\ 
+ 	 (\sum_{k=1}^m O_k^s W_{kd_{h}}^{(2)}-W_{yd_{h}}^{(2)})\mathbb{1}_{\{h_{d_h}^a > 0\}}(h_{d_h}^a)\\
+       \end{array}
+     \right)
+\end{align*}
+
+ \subsection{14 Exprimer sous forme matricielle, préciser les informations, donner l'équivalent en numpy}
+
+
+
+\begin{align*} 
+\frac{\partial L}{\partial h^a} &= 
+	\left(
+     \begin{array}{r}
+	\frac{\partial L}{\partial h^s}
+       \end{array}
+     \right) \odot
+\left(
+     \begin{array}{r}
+	\mathbb{1}_{\{h_1^a > 0\}}(h_1^a)\\
+	\dots\\
+	\mathbb{1}_{\{h_{d_h}^a > 0\}}(h_{d_h}^a)\\
+       \end{array}
+     \right)
+\end{align*}
+
+où $\frac{\partial L}{\partial h^a}$, $\frac{\partial L}{\partial h^s}$ et le vecteur contenant les fonctions indicatrices sont $d_h$ x 1\\
+
+$vector\_indicator = np.array([1 id e> 0 esle 0 for e in hs])$\\
+$grad\_ha = np.multiply(grad\_hs, vector_indicator)$
+
+ \subsection{15 Calculer $\frac{\partial L}{\partial W^{(1)}}$ et $\frac{\partial L}{\partial b^{(1)}}$}
+
+$\frac{\partial L}{\partial W_{jl}^{(1)}} = \frac{\partial L}{\partial h_j^a}\frac{\partial h_j^a}{\partial W_{jl}^{(1)}} = \sum_{k=1}^m O_k^s W_{kj}^{(2) - W_{yj}^{(2)}}\mathbb{1}_{\{h_j^a>0\}}(h_j^a)*\frac{\partial (b_j^{(1)} + \sum_{i=1}^d W_{ji}^{(1)}x_i} {\partial W_{jl}^{(1)}}$\\
+
+$= (\sum_{k=1}^m O_k^s W_{kj}^{(2)}- W_{yj}^{(2)})\mathbb{1}_{\{h_j^a>0\}}(h_j^a)x_l = \frac{\partial L}{\partial h_j^a}*x_l$\\
+
+$\frac{\partial L}{\partial b_j^{(1)}} = \frac{\partial L}{\partial h_j^a}*\frac{\partial h_j^a}{\partial b_j^{(1)}} = \frac{\partial L}{\partial h_j^a}*1 =  \frac{\partial L}{\partial h_j^a}$\\
+
+\begin{align*} 
+\frac{\partial L}{\partial W^{(1)}}
+	&= 
+	\left(
+     \begin{array}{rrrr}
+         \frac{\partial L}{\partial h_1^a}x_1 &  \frac{\partial L}{\partial h_1^a}x_2&   \dots &   \frac{\partial L}{\partial h_1^a}x_d\\
+         \frac{\partial L}{\partial h_2^a}x_1 &  \frac{\partial L}{\partial h_2^a}x_2 &   \dots &   \frac{\partial L}{\partial h_2^a}x_d\\
+         \vdots & \dots & \dots & \vdots \\
+	 \frac{\partial L}{\partial h_{d_{h}}^a}x_1 &  \frac{\partial L}{\partial h_{d_{h}}^a}x_2 &   \dots &   \frac{\partial L}{\partial h_{d_{h}}^a}x_d\\
+       \end{array}
+     \right)
+\end{align*}
+
+$\frac{\partial L}{\partial b^{(1)}} = \frac{\partial L}{\partial h^a}$
+
+
+ \subsection{16 Exprimer sous forme matricielle, définir les dimensions, donner l'équivalent en numpy}
+
+$\frac{\partial L}{\partial b^{(1)}} = \frac{\partial L}{\partial h^a}$ est $d_h$ x 1\\
+
+$\frac{\partial L}{\partial W^{(1)}} = \frac{\partial L}{\partial h^a} * x^t$ est $d_h$ x d car $\frac{\partial L}{\partial h^a}$ est $d_h$ x 1 et $x^t$ est 1 x d\\
+
+$grad\_b1 = grad\_ha$\\
+$grad\_W1 = np.outer(grad\_ha, x)$\\
+
+ \subsection{17 Calculer $\frac{\partial L}{\partial x}$}
+
+$\frac{\partial L}{\partial x_l} = \sum_{j=1}^{d_h} \frac{\partial L}{\partial h_j^a}\frac{\partial h_j^a}{\partial x_l} = \sum_{j=1}^{d_h}\frac{\partial L}{\partial h_j^a} \frac{\partial (b_j^{(1)} + \sum_{i=1}^d W_{ji}^{(1)}x_i)}{\partial x_l} $\\
+
+$= \sum_{j=1}^{d_h} (\sum_{k=1}^m O_k^s W_{kj}^{(2)}-W_{yi}^{(2)})\mathbb{1}_{\{h_j^a>0\}}(h_j^a)W_{jl}^{(1)}$\\
+
+Alors,
+
+\begin{align*} 
+\frac{\partial L}{\partial x}&= 
+	\left(
+     \begin{array}{r}
+         ( \sum_{j=1}^{d_h} (\sum_{k=1}^m O_k^s W_{kj}^{(2)}-W_{yi}^{(2)})\mathbb{1}_{\{h_j^a>0\}}(h_j^a)W_{j1}^{(1)}\\
+        \dots  \dots\\ 
+ 	 ( \sum_{j=1}^{d_h} (\sum_{k=1}^m O_k^s W_{kj}^{(2)}-W_{yi}^{(2)})\mathbb{1}_{\{h_j^a>0\}}(h_j^a)W_{jd}^{(1)}\\
+       \end{array}
+     \right)
+\end{align*}
+
+\begin{align*} 
+&= 
+	\left(
+     \begin{array}{r}
+        \sum_{j=1}^{d_h}\frac{\partial L}{\partial h_j^a}*W_{j1}^{(1)}\\
+        \dots  \dots\\ 
+ 	 \sum_{j=1}^{d_h}\frac{\partial L}{\partial h_j^a}*W_{jd}^{(1)}\\
+       \end{array}
+     \right)
+\end{align*}
+
+
+ \subsection{18 Comment minimiser $\tilde{R} = \hat{R} + \lambda_{11}(\sum_{i,j}|W_{ij}^{(1)}|) + \lambda_{12}(\sum_{i,j}(W_{ij}^{(1)})^2)
++  \lambda_{21}(\sum_{i,j}|W_{ij}^{(2)}|) + \lambda_{22}(\sum_{i,j}(W_{ij}^{(2)})^2)$ au lieu de $\hat{R}$ change le gradient par le rappot aux différents paramètre?}
+
+Il n'y a pas de différence pour $b^{(1)}$ et $b^{(2)}$ car $ \frac{\partial \zeta(\Theta)}{\partial b^{(1)}} =\frac{\partial \zeta(\Theta)}{\partial b^{(2)}} = 0 $
+
+
+\begin{align*} 
+\frac{\partial \zeta(\Theta)}{\partial W^{(1)}} &= \lambda_{11}
+	\left (
+     \begin{array}{rrrr}
+       sign(W_{11}^{(1)}) & sign(W_{12}^{(1)}) & \dots & sign(W_{1d}^{(1)})\\
+        sign(W_{11}^{(1)}) & \dots  & \dots & \vdots\\ 
+ 	sign(W_{d_{h}1}^{(1)}) & sign(W_{d_{h}2}^{(1)}) & \dots & sign(W_{d_{h}d}^{(1)})\\
+       \end{array}
+     \right) + \lambda_{12}
+	\left (
+     \begin{array}{rrrr}
+       2W_{11}^{(1)} & 2W_{12}^{(1)} & \dots & 2W_{1d}^{(1)}\\
+        2W_{11}^{(1)} & \dots  & \dots & \vdots\\ 
+ 	2W_{d_{h}1}^{(1)} & 2W_{d_{h}2}^{(1)} & \dots & 2W_{d_{h}d}^{(1)}\\
+       \end{array}
+     \right)
+\end{align*}
+
+$ = \lambda_{11} sign(W^{(1)}) + 2\lambda_{12}W^{(1)}$ \\
+
+Alors,\\
+$\frac{\partial \tilde{R}}{\partial W^{(1)}} + \lambda_{11} sign(W^{(1)}) + 2\lambda_{12}W^{(1)}$\\
+
+et de la même façon, $\frac{\partial \tilde{R}}{\partial W^{(2)}} + \lambda_{21} sign(W^{(2)}) + 2\lambda_{22}W^{(2)}$ 
 
 
 
