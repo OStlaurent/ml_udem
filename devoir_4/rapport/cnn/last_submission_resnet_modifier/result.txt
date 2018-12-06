@@ -1,0 +1,7 @@
+idee: reduire la capacite  du resnet 18
+
+best on cross-validation 66.55% epoch 31dropout2d
+on kaggle 0.64457%
+
+au lieu de 18 layer  (1 conv 2d, 16 conv 3x3, 1 fully connected layer)
+resnet reduit a 10 layers (1 conv 2d, 8 conv 3x3, 1 fully connected layer) avec l'ajout dun dropout 2d

@@ -1,0 +1,2 @@
+verification si augmenter la capaciter aide,
+hypothese: non vu que renset 18, selon graph, overfit

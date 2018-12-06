@@ -1,0 +1,3 @@
+default svm lineaire from scikitlearn: 0.04733% on kaggle
+
+meme default svm lineaire, entrainer avec x_train clean: 0.10966 on kaggle
