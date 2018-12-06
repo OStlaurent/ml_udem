@@ -1,2 +1,2 @@
-je n'ai plus le code, mais cetait un cnn de base (relu, pas de pool, avec 2 couche conv) 
+je n'ai plus le code, mais cetait un cnn de base (relu avec 2 couche conv) 
 hypothese que reste bloquer a environ 20%: manque de capaciter
